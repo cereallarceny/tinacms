@@ -507,11 +507,13 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
+    console.log('put', filepath, this.qualifyPath(filepath))
     const ref = await this.getRef()
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
       ref
     )
+    console.log({ pathParts, pathEntries })
 
     const blobUpdate = toUint8Array(Buffer.from(data))
 
@@ -531,6 +533,7 @@ export class IsomorphicBridge implements Bridge {
       ...this.isomorphicConfig,
       blob: blobUpdate,
     })
+    console.log({ updatedOid })
 
     const updatedRootSha = await this.updateTreeHierarchy(
       existingOid,
@@ -540,6 +543,7 @@ export class IsomorphicBridge implements Bridge {
       pathEntries.slice(0, pathEntries.length - 1),
       pathParts.slice(0, pathParts.length - 1)
     )
+    console.log({ updatedRootSha })
 
     await this.commitTree(updatedRootSha, ref)
     await git.updateIndex({
